@@ -287,9 +287,9 @@ func main() {
 		title := feedData[:strings.Index(feedData, "</title>")]
 		pubday := feedData[strings.Index(feedData, "<pubDate>")+14 : strings.Index(feedData, "<pubDate>")+16]
 		pubTime := feedData[strings.Index(feedData, "<pubDate>")+26 : strings.Index(feedData, "<pubDate>")+34]
-		pubMonth := ".09"
-		pubYear := ".2022"
-		pubDate := pubYear + pubMonth + pubday
+		pubMonth := "-09"
+		pubYear := "2022"
+		pubDate := pubYear + pubMonth + "-" + pubday
 
 		news := make(map[string]int)
 		dontinsert := false
@@ -321,7 +321,7 @@ func main() {
 
 			if title != "Новости Правительство Московской области" {
 
-				_, err := db.Exec("INSERT INTO `iu9kuivashev` (`titile`, `date`, `time`, `author`, `text`) VALUES ('News', ?, ?, 'dmikuivashev', ?)", pubDate, pubTime, title)
+				_, err := db.Exec("INSERT INTO `iu9kuivashev` (`titile`, `date`, `time`, `author`, `text`) VALUES (?, ?, ?, 'dmikuivashev', ?)", title, pubDate, pubTime, title)
 				fmt.Print("\u001B[1m")
 
 				fmt.Println("\033[38;5;117m INSERTED:\u001B[0m", title)
