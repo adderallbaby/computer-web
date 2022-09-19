@@ -284,15 +284,13 @@ func main() {
 		}
 		defer db.Close()
 		feedData = feedData[strings.Index(feedData, "<title>")+7:]
-		title := feedData[:strings.Index(feedData, "</title>")]
+		title := feedData[:strings.Index(feedData, "</title>")] // + " a"
 		pubday := feedData[strings.Index(feedData, "<pubDate>")+14 : strings.Index(feedData, "<pubDate>")+16]
 		pubTime := feedData[strings.Index(feedData, "<pubDate>")+26 : strings.Index(feedData, "<pubDate>")+34]
 		pubMonth := "-09"
 		pubYear := "2022"
 		pubDate := pubYear + pubMonth + "-" + pubday
-
-		news := make(map[string]int)
-		dontinsert := false
+		cancellInsertation := false
 		var (
 			text string
 		)
@@ -304,36 +302,26 @@ func main() {
 		for rows.Next() {
 			err := rows.Scan(&text)
 			text = text[:len(text)-2]
-			news[text] = news[text] + 1
 			if text == title[:len(title)-2] {
-				dontinsert = true
+				cancellInsertation = true
 			}
-
 			if err != nil {
-				fmt.Println("AFDSFSD")
+				fmt.Println("\033[38;5;125mERROR\u001B[0m")
 			}
-
 		}
 		err = rows.Err()
-		news[text] = news[text] + 1
-
-		if dontinsert == false {
-
+		if cancellInsertation == false {
 			if title != "Новости Правительство Московской области" {
-
 				_, err := db.Exec("INSERT INTO `iu9kuivashev` (`titile`, `date`, `time`, `author`, `text`) VALUES (?, ?, ?, 'dmikuivashev', ?)", title, pubDate, pubTime, title)
 				fmt.Print("\u001B[1m")
-
-				fmt.Println("\033[38;5;117m INSERTED:\u001B[0m", title)
+				fmt.Println("\033[38;5;159m INSERTED:\u001B[0m", "\033[38;5;251m"+title+"\u001B[0m")
 				if err != nil {
 					panic(err)
 				}
 			}
 		} else {
 			fmt.Print("\u001B[1m")
-			fmt.Println("\033[38;5;196m CAN'T INSERT\u001B[0m", title)
+			fmt.Println("\033[38;5;196m CAN'T INSERT\u001B[0m", "\033[38;5;251m"+title+"\u001B[0m")
 
 		}
 	}
-
-}
