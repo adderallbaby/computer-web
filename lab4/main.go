@@ -16,8 +16,9 @@ type Package struct {
 }
 
 type Node struct {
-	Connections map[string]bool
-	Address     Address
+	Connections  map[string]bool
+	Address      Address
+	StartingNode bool
 }
 
 type Address struct {
@@ -25,7 +26,7 @@ type Address struct {
 	Port string
 }
 
-// ./ main :8080
+// ./ main :8080 or any other port as the second argument
 func init() {
 	if len(os.Args) != 2 {
 		panic("len args !=2")
@@ -48,6 +49,7 @@ func NewNode(address string) *Node {
 			IPv4: splitted[0],
 			Port: ":" + splitted[1],
 		},
+		StartingNode: false,
 	}
 }
 
@@ -90,7 +92,15 @@ func handleConnection(node *Node, conn net.Conn) {
 		return
 	}
 	node.ConnectTo([]string{pack.From})
-	fmt.Println(pack.Data)
+	if pack.Data[0:13] == "/__NETWORK__/" {
+		node.PrintNetwork()
+		fmt.Println("|:" + pack.Data[14:])
+
+	} else {
+		fmt.Println(pack.Data)
+
+	}
+
 }
 func handleClient(node *Node) {
 	for {
@@ -103,14 +113,18 @@ func handleClient(node *Node) {
 			node.ConnectTo(splitted[1:])
 		case "/network":
 			node.PrintNetwork()
+
 		default:
 			node.SendMessageToAll(message)
+
 		}
 	}
 }
 func (node *Node) PrintNetwork() {
-	for addr := range node.Connections {
-		fmt.Println("|", addr)
+	if !node.StartingNode {
+		node.StartingNode = true
+		fmt.Println("|" + node.Address.Port)
+		node.SendMessageToAll("/__NETWORK__/")
 	}
 }
 
@@ -126,9 +140,16 @@ func (node *Node) SendMessageToAll(message string) {
 		From: node.Address.IPv4 + node.Address.Port,
 		Data: message,
 	}
+	// var pack_ring = Package{
+	// 	From: node.Address.IPv4 + node.Address.Port,
+	// 	Data: "/network",
+	// }
 	for addr := range node.Connections {
 		new_pack.To = addr
+		// pack_ring.To = addr
 		node.Send(&new_pack)
+		// node.Send(&pack_ring)
+
 	}
 }
 
@@ -138,9 +159,21 @@ func (node *Node) Send(pack *Package) {
 		delete(node.Connections, pack.To)
 		return
 	}
+	// var pack_ring = Package{
+	// 	From: node.Address.IPv4 + node.Address.Port,
+	// 	Data: "/network",
+	//}
 	defer conn.Close()
+	if pack.Data == "/__NETWORK__/" {
+		pack.Data = pack.Data + pack.From
+	}
 	json_pack, _ := json.Marshal(*pack)
+	// json_ring, _ := json.Marshal(*&pack_ring)
+
 	conn.Write(json_pack)
+	node.PrintNetwork()
+	// conn.Write(json_ring)
+
 }
 
 func InputString() string {
