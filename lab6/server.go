@@ -10,10 +10,10 @@ import (
 
 func main() {
 
-	root := flag.String("root", "/Users/dmikuivashev/Downloads/vlab6/server", "Root directory to serve")
+	root := flag.String("root", "*your_directory*", "Root directory to serve")
 	// на предыдущей строке вторым приколом путь на папку, которая в роли сервера выступает
-	user := flag.String("user", "dmikuivashev", "Username for login")
-	pass := flag.String("pass", "1234", "Password for login")
+	user := flag.String("user", "dmi", "Username for login")
+	pass := flag.String("pass", "dima777", "Password for login")
 	port := flag.Int("port", 2121, "Port")
 	host := flag.String("host", "localhost", "Host")
 
