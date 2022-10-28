@@ -29,7 +29,7 @@ func main() {
 	password := "*app password*"
 	subject := "*subject*"
 
-	sender := "*email*
+	sender := "*email*"
 	rows, err := db.Query("select email, name from *table*)
 	defer rows.Close()
 	var text string
