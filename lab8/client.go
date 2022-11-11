@@ -20,7 +20,7 @@ type Mail struct {
 }
 
 func main() {
-	db, err1 := sql.Open("mysql", "iu9networkslabs:Je2dTYr6@tcp(students.yss.su)/iu9networkslabs")
+	db, err1 := sql.Open("mysql", пароль и логин с протоколом)
 	if err1 != nil {
 		fmt.Println("\033[38;5;125mGOT ERROR TRYING TO CONNECT TO THE DATABASE\u001B[0m")
 	}
